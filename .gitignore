@@ -1,0 +1,13 @@
+.env
+*.db
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+backend/ml_models/*.pkl
+node_modules/
+dist/
+.DS_Store
+*.log
+test_movie_recommender.db

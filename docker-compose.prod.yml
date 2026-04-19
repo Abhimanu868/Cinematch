@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+  backend:
+    build: ./backend
+    container_name: cineai_backend_prod
+    expose:
+      - "8000"
+    volumes:
+      - db_data:/app/data
+    environment:
+      - DATABASE_URL=sqlite:///./data/movie_recommender.db
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=false
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: cineai_frontend_prod
+    expose:
+      - "80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: cineai_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend
+      - frontend
+    restart: unless-stopped
+
+volumes:
+  db_data:
