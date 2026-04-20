@@ -3,7 +3,6 @@ import { useParams, Link } from 'react-router-dom';
 import { getMovie, getSimilarMovies } from '../api/client';
 import RatingStars from '../components/RatingStars';
 import RecommendationRow from '../components/RecommendationRow';
-import MoviePoster from '../components/MoviePoster';
 import { formatRuntime, getGenreList } from '../utils/helpers';
 import { useAuthStore } from '../store/authStore';
 
@@ -37,18 +36,15 @@ export default function MovieDetail() {
   if (!movie) return <div className="error-page"><h2>Movie not found</h2><Link to="/">← Back home</Link></div>;
 
   const genres = getGenreList(movie.genres);
+  const FALLBACK_IMAGE = "https://placehold.co/300x450/1a1a2e/white?text=No+Poster";
+  const backdropStyle = movie.backdrop_url
+    ? { backgroundImage: `url(${movie.backdrop_url})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+    : { background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)" };
 
   return (
     <div className="movie-detail-page">
       {/* Backdrop */}
-      <div className="detail-backdrop" style={!movie.backdrop_url ? { background: 'linear-gradient(to bottom, #111827, #000000)' } : {}}>
-        {movie.backdrop_url && (
-          <img
-            src={movie.backdrop_url}
-            alt=""
-            style={{ filter: 'brightness(0.4)' }}
-          />
-        )}
+      <div className="detail-backdrop" style={backdropStyle}>
         <div className="backdrop-overlay" />
       </div>
 
@@ -56,7 +52,12 @@ export default function MovieDetail() {
         <div className="detail-main">
           {/* Poster */}
           <div className="detail-poster">
-            <MoviePoster posterUrl={movie.poster_url} title={movie.title} />
+            <img
+              src={movie.poster_url || FALLBACK_IMAGE}
+              alt={movie.title}
+              onError={(e) => { e.target.src = FALLBACK_IMAGE; }}
+              style={{ width: "300px", borderRadius: "8px", boxShadow: "0 4px 20px rgba(0,0,0,0.5)" }}
+            />
           </div>
 
           {/* Info */}

@@ -180,3 +180,35 @@ def get_movie(
         user_rating=user_rating,
         created_at=movie.created_at,
     )
+
+
+@router.post("/admin/fetch-posters")
+async def backfill_posters(db: Session = Depends(get_db)):
+    from app.services.tmdb_service import fetch_tmdb_poster
+    import asyncio, time
+    from app.models.movie import Movie
+    
+    movies = db.query(Movie).all()
+    updated, skipped, failed = 0, 0, 0
+    
+    for movie in movies:
+        # Skip if already has a valid TMDB URL
+        if movie.poster_url and "image.tmdb.org" in movie.poster_url:
+            skipped += 1
+            continue
+        
+        data = await fetch_tmdb_poster(movie.title, getattr(movie, 'release_year', None))
+        if data.get("poster_url"):
+            movie.poster_url = data["poster_url"]
+            movie.backdrop_url = data.get("backdrop_url")
+            movie.tmdb_id = data.get("tmdb_id")
+            updated += 1
+        else:
+            movie.poster_url = f"https://placehold.co/300x450/1a1a2e/white?text={movie.title.replace(' ', '+')}"
+            failed += 1
+        
+        await asyncio.sleep(0.25)
+    
+    db.commit()
+    return {"updated": updated, "skipped": skipped, "failed": failed}
+

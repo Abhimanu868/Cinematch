@@ -1,15 +1,21 @@
 import { Link } from 'react-router-dom';
 import { getGenreList, truncate } from '../utils/helpers';
 import RatingStars from './RatingStars';
-import MoviePoster from './MoviePoster';
 export default function MovieCard({ movie, onRate, showScore, score, method }) {
   const genres = getGenreList(movie.genres);
+  const FALLBACK_IMAGE = "https://placehold.co/300x450/1a1a2e/white?text=No+Poster";
 
   return (
     <div className="movie-card">
       <Link to={`/movies/${movie.id}`} className="card-poster-link">
         <div className="card-poster">
-          <MoviePoster posterUrl={movie.poster_url} title={movie.title} />
+          <img
+            src={movie.poster_url || FALLBACK_IMAGE}
+            alt={movie.title}
+            loading="lazy"
+            onError={(e) => { e.target.src = FALLBACK_IMAGE; }}
+            style={{ width: "100%", aspectRatio: "2/3", objectFit: "cover" }}
+          />
           <div className="card-overlay">
             <span className="card-rating">⭐ {movie.vote_average?.toFixed(1)}</span>
             {showScore && score != null && (

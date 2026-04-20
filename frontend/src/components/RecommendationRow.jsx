@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { truncate, getGenreList } from '../utils/helpers';
-import MoviePoster from './MoviePoster';
 
 export default function RecommendationRow({ title, movies, loading, emptyMessage }) {
   if (loading) {
@@ -37,10 +36,17 @@ export default function RecommendationRow({ title, movies, loading, emptyMessage
           const score = item.score;
           const method = item.method;
           const genres = getGenreList(movie.genres);
+          const FALLBACK_IMAGE = "https://placehold.co/300x450/1a1a2e/white?text=No+Poster";
           return (
             <Link key={movie.id} to={`/movies/${movie.id}`} className="rec-card">
               <div className="rec-poster">
-                <MoviePoster posterUrl={movie.poster_url} title={movie.title} />
+                <img
+                  src={movie.poster_url || FALLBACK_IMAGE}
+                  alt={movie.title}
+                  loading="lazy"
+                  onError={(e) => { e.target.src = FALLBACK_IMAGE; }}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
                 {score != null && (
                   <span className="rec-score">{Math.round(score * 100)}%</span>
                 )}
