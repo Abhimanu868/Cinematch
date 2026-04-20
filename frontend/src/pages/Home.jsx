@@ -33,6 +33,7 @@ export default function Home() {
         setTotal(res.data.total);
       }
     } catch (e) {
+      console.error('Failed to fetch movies:', e?.response?.data || e?.message || e);
       setMovies([]);
     } finally {
       setLoading(false);

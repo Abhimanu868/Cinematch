@@ -55,7 +55,7 @@ export default function MovieDetail() {
             <img
               src={movie.poster_url || FALLBACK_IMAGE}
               alt={movie.title}
-              onError={(e) => { e.target.src = FALLBACK_IMAGE; }}
+              onError={(e) => { e.target.onerror = null; e.target.src = FALLBACK_IMAGE; }}
               style={{ width: "300px", borderRadius: "8px", boxShadow: "0 4px 20px rgba(0,0,0,0.5)" }}
             />
           </div>

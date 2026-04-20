@@ -13,7 +13,7 @@ export default function MovieCard({ movie, onRate, showScore, score, method }) {
             src={movie.poster_url || FALLBACK_IMAGE}
             alt={movie.title}
             loading="lazy"
-            onError={(e) => { e.target.src = FALLBACK_IMAGE; }}
+            onError={(e) => { e.target.onerror = null; e.target.src = FALLBACK_IMAGE; }}
             style={{ width: "100%", aspectRatio: "2/3", objectFit: "cover" }}
           />
           <div className="card-overlay">
