@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { truncate, getGenreList } from '../utils/helpers';
+import MoviePoster from './MoviePoster';
 
 export default function RecommendationRow({ title, movies, loading, emptyMessage }) {
   if (loading) {
@@ -39,12 +40,7 @@ export default function RecommendationRow({ title, movies, loading, emptyMessage
           return (
             <Link key={movie.id} to={`/movies/${movie.id}`} className="rec-card">
               <div className="rec-poster">
-                <img
-                  src={movie.poster_url || `https://picsum.photos/seed/${movie.id}/200/300`}
-                  alt={movie.title}
-                  loading="lazy"
-                  onError={(e) => { e.target.src = `https://picsum.photos/seed/movie${movie.id}/200/300`; }}
-                />
+                <MoviePoster posterUrl={movie.poster_url} title={movie.title} />
                 {score != null && (
                   <span className="rec-score">{Math.round(score * 100)}%</span>
                 )}

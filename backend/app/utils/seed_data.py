@@ -1,11 +1,14 @@
 """Seed database with 500+ movies and 5000+ synthetic ratings."""
 import random
 import logging
+import time
+import asyncio
 from sqlalchemy.orm import Session
 from app.models.movie import Movie
 from app.models.rating import Rating
 from app.models.user import User
 from app.services.auth_service import hash_password
+from app.services.tmdb_service import enrich_movie_with_tmdb
 
 logger = logging.getLogger(__name__)
 
@@ -194,12 +197,20 @@ def seed_movies_and_ratings(db: Session) -> dict:
     # Add curated movies
     for i, m in enumerate(MOVIES_DATA):
         title, year, genres, overview, director, cast, keywords, runtime, rating, votes, pop = m
+        
+        logger.info(f"Fetching poster for: {title}... ✓")
+        tmdb_data = asyncio.run(enrich_movie_with_tmdb(title, year))
+        time.sleep(0.25)
+        
         movie = Movie(
-            title=title, release_year=year, genres=genres, overview=overview,
+            title=title, release_year=year, genres=genres, 
+            overview=tmdb_data.get("overview") or overview,
             director=director, cast=cast, keywords=keywords, runtime=runtime,
             vote_average=rating, vote_count=votes, popularity=pop,
-            poster_url=f"https://picsum.photos/seed/{title.replace(' ','')}/300/450",
-            backdrop_url=f"https://picsum.photos/seed/{title.replace(' ','')}_bg/1280/720",
+            poster_url=tmdb_data.get("poster_url") or f"https://picsum.photos/seed/{title.replace(' ','')}/300/450",
+            backdrop_url=tmdb_data.get("backdrop_url") or f"https://picsum.photos/seed/{title.replace(' ','')}_bg/1280/720",
+            tmdb_id=tmdb_data.get("tmdb_id"),
+            tagline=tmdb_data.get("tagline")
         )
         db.add(movie)
         movies.append(movie)
@@ -214,12 +225,20 @@ def seed_movies_and_ratings(db: Session) -> dict:
         pop = round(random.uniform(10.0, 70.0), 1)
         overview = _OVERVIEWS[i % len(_OVERVIEWS)]
         director = _DIRECTORS[i % len(_DIRECTORS)]
+        
+        logger.info(f"Fetching poster for: {title}... ✓")
+        tmdb_data = asyncio.run(enrich_movie_with_tmdb(title, year))
+        time.sleep(0.25)
+        
         movie = Movie(
-            title=title, release_year=year, genres=tmpl["genres"], overview=overview,
+            title=title, release_year=year, genres=tmpl["genres"], 
+            overview=tmdb_data.get("overview") or overview,
             director=director, cast=tmpl["cast"], keywords=tmpl["keywords"],
             runtime=runtime, vote_average=rating, vote_count=votes, popularity=pop,
-            poster_url=f"https://picsum.photos/seed/{title.replace(' ','')}/300/450",
-            backdrop_url=f"https://picsum.photos/seed/{title.replace(' ','')}_bg/1280/720",
+            poster_url=tmdb_data.get("poster_url") or f"https://picsum.photos/seed/{title.replace(' ','')}/300/450",
+            backdrop_url=tmdb_data.get("backdrop_url") or f"https://picsum.photos/seed/{title.replace(' ','')}_bg/1280/720",
+            tmdb_id=tmdb_data.get("tmdb_id"),
+            tagline=tmdb_data.get("tagline")
         )
         db.add(movie)
         movies.append(movie)

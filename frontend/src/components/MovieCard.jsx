@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { getGenreList, truncate } from '../utils/helpers';
 import RatingStars from './RatingStars';
-
+import MoviePoster from './MoviePoster';
 export default function MovieCard({ movie, onRate, showScore, score, method }) {
   const genres = getGenreList(movie.genres);
 
@@ -9,12 +9,7 @@ export default function MovieCard({ movie, onRate, showScore, score, method }) {
     <div className="movie-card">
       <Link to={`/movies/${movie.id}`} className="card-poster-link">
         <div className="card-poster">
-          <img
-            src={movie.poster_url || `https://picsum.photos/seed/${movie.id}/300/450`}
-            alt={movie.title}
-            loading="lazy"
-            onError={(e) => { e.target.src = `https://picsum.photos/seed/movie${movie.id}/300/450`; }}
-          />
+          <MoviePoster posterUrl={movie.poster_url} title={movie.title} />
           <div className="card-overlay">
             <span className="card-rating">⭐ {movie.vote_average?.toFixed(1)}</span>
             {showScore && score != null && (

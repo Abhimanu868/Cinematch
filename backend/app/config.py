@@ -13,6 +13,11 @@ class Settings(BaseSettings):
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = True
 
+    # TMDB API
+    TMDB_API_KEY: str = os.getenv("TMDB_API_KEY", "")
+    TMDB_IMAGE_BASE_URL: str = "https://image.tmdb.org/t/p/w500"
+    TMDB_BACKDROP_BASE_URL: str = "https://image.tmdb.org/t/p/w1280"
+
     # Database
     DATABASE_URL: str = "sqlite:///./movie_recommender.db"
 

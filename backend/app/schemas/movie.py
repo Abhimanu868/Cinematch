@@ -15,6 +15,8 @@ class MovieBase(BaseModel):
     keywords: str | None = None
     poster_url: str | None = None
     backdrop_url: str | None = None
+    tmdb_id: int | None = None
+    tagline: str | None = None
     runtime: int | None = None
 
 

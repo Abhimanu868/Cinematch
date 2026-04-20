@@ -22,6 +22,8 @@ class Movie(Base):
     keywords = Column(Text, nullable=True)  # Comma-separated keywords
     poster_url = Column(String(500), nullable=True)
     backdrop_url = Column(String(500), nullable=True)
+    tmdb_id = Column(Integer, nullable=True)
+    tagline = Column(String(500), nullable=True)
     vote_average = Column(Float, default=0.0)
     vote_count = Column(Integer, default=0)
     popularity = Column(Float, default=0.0)

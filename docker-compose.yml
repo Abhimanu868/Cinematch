@@ -13,7 +13,8 @@ services:
       - DATABASE_URL=sqlite:///./data/movie_recommender.db
       - SECRET_KEY=dev-secret-key
       - DEBUG=true
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+      - TMDB_API_KEY=${TMDB_API_KEY}
+    command: sh -c "python migrate_add_tmdb_columns.py && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
 
   frontend:
     image: node:20-alpine

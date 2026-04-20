@@ -29,6 +29,12 @@ A complete, production-ready Movie Recommendation System built with a Machine Le
 - Docker and Docker Compose installed.
 - Or, Node.js v20+ and Python 3.11+ for local setup.
 
+### Getting TMDB API Key
+1. Go to https://www.themoviedb.org/settings/api
+2. Register for a free account
+3. Request an API key (free for non-commercial use)
+4. Add it to your backend `.env` file as `TMDB_API_KEY` and frontend `.env` file as `VITE_TMDB_API_KEY`.
+
 ### Option 1: Docker (Recommended)
 
 1. Clone or open the repository.

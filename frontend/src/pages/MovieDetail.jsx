@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { getMovie, getSimilarMovies } from '../api/client';
 import RatingStars from '../components/RatingStars';
 import RecommendationRow from '../components/RecommendationRow';
+import MoviePoster from '../components/MoviePoster';
 import { formatRuntime, getGenreList } from '../utils/helpers';
 import { useAuthStore } from '../store/authStore';
 
@@ -40,12 +41,14 @@ export default function MovieDetail() {
   return (
     <div className="movie-detail-page">
       {/* Backdrop */}
-      <div className="detail-backdrop">
-        <img
-          src={movie.backdrop_url || movie.poster_url || `https://picsum.photos/seed/${movie.id}_bg/1280/720`}
-          alt=""
-          onError={(e) => { e.target.src = `https://picsum.photos/seed/bg${movie.id}/1280/720`; }}
-        />
+      <div className="detail-backdrop" style={!movie.backdrop_url ? { background: 'linear-gradient(to bottom, #111827, #000000)' } : {}}>
+        {movie.backdrop_url && (
+          <img
+            src={movie.backdrop_url}
+            alt=""
+            style={{ filter: 'brightness(0.4)' }}
+          />
+        )}
         <div className="backdrop-overlay" />
       </div>
 
@@ -53,11 +56,7 @@ export default function MovieDetail() {
         <div className="detail-main">
           {/* Poster */}
           <div className="detail-poster">
-            <img
-              src={movie.poster_url || `https://picsum.photos/seed/${movie.id}/300/450`}
-              alt={movie.title}
-              onError={(e) => { e.target.src = `https://picsum.photos/seed/poster${movie.id}/300/450`; }}
-            />
+            <MoviePoster posterUrl={movie.poster_url} title={movie.title} />
           </div>
 
           {/* Info */}
@@ -66,6 +65,7 @@ export default function MovieDetail() {
               {genres.map((g) => <span key={g} className="genre-pill">{g}</span>)}
             </div>
             <h1 className="detail-title">{movie.title}</h1>
+            {movie.tagline && <p className="detail-tagline" style={{ fontStyle: 'italic', opacity: 0.8, marginTop: '-5px', marginBottom: '15px', fontSize: '1.1rem' }}>"{movie.tagline}"</p>}
             <div className="detail-meta">
               {movie.release_year && <span>📅 {movie.release_year}</span>}
               {movie.runtime && <span>⏱ {formatRuntime(movie.runtime)}</span>}
