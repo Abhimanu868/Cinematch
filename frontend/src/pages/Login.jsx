@@ -12,16 +12,20 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.username || !form.password) { toast.error('Fill in all fields'); return; }
+    if (!form.username || !form.password) { 
+      toast.error('Fill in all fields'); 
+      return; 
+    }
     setLoading(true);
     try {
+      // login now returns token + user directly — no getMe() call needed
       const res = await login(form);
-      const { access_token } = res.data;
-      // Fetch user profile
-      const { getMe } = await import('../api/client');
-      const meRes = await getMe();
-      setAuth(meRes.data, access_token);
-      toast.success(`Welcome back, ${meRes.data.username}!`);
+      const { access_token, user } = res.data;
+      
+      // Save token FIRST
+      setAuth(user, access_token);
+      
+      toast.success(`Welcome back, ${user.username}!`);
       navigate('/');
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Login failed');

@@ -42,3 +42,9 @@ class TokenData(BaseModel):
     """Decoded JWT payload."""
     user_id: int | None = None
     username: str | None = None
+
+
+class TokenWithUser(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: UserResponse

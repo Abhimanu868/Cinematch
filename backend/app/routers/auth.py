@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.user import User
-from app.schemas.user import UserCreate, UserLogin, UserResponse, Token
+from app.schemas.user import UserCreate, UserLogin, UserResponse, Token, TokenWithUser
 from app.services.auth_service import (
     create_access_token,
     get_current_user,
@@ -16,9 +16,9 @@ from app.services.auth_service import (
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 
 
-@router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-def register(user_data: UserCreate, db: Session = Depends(get_db)) -> UserResponse:
-    """Register a new user account."""
+@router.post("/register", response_model=TokenWithUser, status_code=status.HTTP_201_CREATED)
+def register(user_data: UserCreate, db: Session = Depends(get_db)) -> TokenWithUser:
+    """Register a new user account and return token immediately."""
     # Check for existing username
     existing = db.query(User).filter(User.username == user_data.username).first()
     if existing:
@@ -44,12 +44,22 @@ def register(user_data: UserCreate, db: Session = Depends(get_db)) -> UserRespon
     db.add(user)
     db.commit()
     db.refresh(user)
-    return user
+
+    # Generate token immediately — no second login call needed
+    access_token = create_access_token(
+        data={"sub": str(user.id), "username": user.username}
+    )
+
+    return TokenWithUser(
+        access_token=access_token,
+        token_type="bearer",
+        user=UserResponse.model_validate(user),
+    )
 
 
-@router.post("/login", response_model=Token)
-def login(credentials: UserLogin, db: Session = Depends(get_db)) -> Token:
-    """Authenticate user and return JWT token."""
+@router.post("/login", response_model=TokenWithUser)
+def login(credentials: UserLogin, db: Session = Depends(get_db)) -> TokenWithUser:
+    """Authenticate user and return JWT token with user info."""
     user = db.query(User).filter(User.username == credentials.username).first()
     if not user or not verify_password(credentials.password, user.hashed_password):
         raise HTTPException(
@@ -67,7 +77,12 @@ def login(credentials: UserLogin, db: Session = Depends(get_db)) -> Token:
     access_token = create_access_token(
         data={"sub": str(user.id), "username": user.username}
     )
-    return Token(access_token=access_token)
+
+    return TokenWithUser(
+        access_token=access_token,
+        token_type="bearer",
+        user=UserResponse.model_validate(user),
+    )
 
 
 @router.get("/me", response_model=UserResponse)

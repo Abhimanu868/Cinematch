@@ -3,20 +3,25 @@ import { persist } from 'zustand/middleware';
 
 export const useAuthStore = create(
   persist(
-    (set, get) => ({
-      user: null,
+    (set) => ({
       token: null,
+      user: null,
       isAuthenticated: false,
 
-      setAuth: (user, token) => set({ user, token, isAuthenticated: true }),
+      setAuth: (user, token) => set({
+        token,
+        user,
+        isAuthenticated: true,
+      }),
 
-      logout: () => set({ user: null, token: null, isAuthenticated: false }),
-
-      updateUser: (user) => set({ user }),
+      logout: () => set({
+        token: null,
+        user: null,
+        isAuthenticated: false,
+      }),
     }),
     {
-      name: 'auth-storage',
-      partialize: (state) => ({ user: state.user, token: state.token, isAuthenticated: state.isAuthenticated }),
+      name: 'cinematch-auth',
     }
   )
 );

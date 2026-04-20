@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { register, login, getMe } from '../api/client';
+import { register } from '../api/client';
 import { useAuthStore } from '../store/authStore';
 import toast from 'react-hot-toast';
 
@@ -12,15 +12,31 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.username || !form.email || !form.password) { toast.error('Fill in all fields'); return; }
-    if (form.password.length < 6) { toast.error('Password must be at least 6 characters'); return; }
-    if (form.password !== form.confirm) { toast.error('Passwords do not match'); return; }
+    if (!form.username || !form.email || !form.password) { 
+      toast.error('Fill in all fields'); 
+      return; 
+    }
+    if (form.password.length < 6) { 
+      toast.error('Password must be at least 6 characters'); 
+      return; 
+    }
+    if (form.password !== form.confirm) { 
+      toast.error('Passwords do not match'); 
+      return; 
+    }
     setLoading(true);
     try {
-      await register({ username: form.username, email: form.email, password: form.password });
-      const loginRes = await login({ username: form.username, password: form.password });
-      const meRes = await getMe();
-      setAuth(meRes.data, loginRes.data.access_token);
+      // register now returns token + user directly — no second login call needed
+      const res = await register({ 
+        username: form.username, 
+        email: form.email, 
+        password: form.password 
+      });
+      const { access_token, user } = res.data;
+      
+      // Save token FIRST before any other API call
+      setAuth(user, access_token);
+      
       toast.success('Account created! Welcome 🎉');
       navigate('/');
     } catch (err) {
