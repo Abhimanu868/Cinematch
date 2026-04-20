@@ -8,7 +8,7 @@ from app.models.movie import Movie
 from app.models.rating import Rating
 from app.models.user import User
 from app.services.auth_service import hash_password
-from app.services.tmdb_service import fetch_tmdb_poster_sync, TMDB_API_KEY
+from app.services.tmdb_service import fetch_tmdb_poster_sync, TMDB_API_KEY, OMDB_API_KEY
 
 logger = logging.getLogger(__name__)
 
@@ -216,10 +216,11 @@ def seed_movies_and_ratings(db: Session) -> dict:
             movie.overview = tmdb_data.get("overview") or overview
             print(f"  ✓ Poster found: {title}")
         else:
-            movie.poster_url = f"https://placehold.co/300x450/1a1a2e/white?text={title.replace(' ', '+')}"
+            safe_title = title.replace(' ', '+').replace("'", '')
+            movie.poster_url = f"https://placehold.co/300x450/1f1f3d/e2b616?text={safe_title}&font=raleway"
             print(f"  ✗ No poster (using placeholder): {title}")
-        if TMDB_API_KEY:
-            time.sleep(0.25)
+        if OMDB_API_KEY or TMDB_API_KEY:
+            time.sleep(0.3)
         
         db.add(movie)
         movies.append(movie)
@@ -253,10 +254,11 @@ def seed_movies_and_ratings(db: Session) -> dict:
             movie.overview = tmdb_data.get("overview") or overview
             print(f"  ✓ Poster found: {title}")
         else:
-            movie.poster_url = f"https://placehold.co/300x450/1a1a2e/white?text={title.replace(' ', '+')}"
+            safe_title = title.replace(' ', '+').replace("'", '')
+            movie.poster_url = f"https://placehold.co/300x450/1f1f3d/e2b616?text={safe_title}&font=raleway"
             print(f"  ✗ No poster (using placeholder): {title}")
-        if TMDB_API_KEY:
-            time.sleep(0.25)
+        if OMDB_API_KEY or TMDB_API_KEY:
+            time.sleep(0.3)
         
         db.add(movie)
         movies.append(movie)

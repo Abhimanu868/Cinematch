@@ -10,11 +10,14 @@ export default function MovieCard({ movie, onRate, showScore, score, method }) {
       <Link to={`/movies/${movie.id}`} className="card-poster-link">
         <div className="card-poster">
           <img
-            src={movie.poster_url || FALLBACK_IMAGE}
+            src={movie.poster_url || `https://placehold.co/300x450/1f1f3d/e2b616?text=${encodeURIComponent(movie.title)}&font=raleway`}
             alt={movie.title}
             loading="lazy"
-            onError={(e) => { e.target.onerror = null; e.target.src = FALLBACK_IMAGE; }}
-            style={{ width: "100%", aspectRatio: "2/3", objectFit: "cover" }}
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = `https://placehold.co/300x450/1f1f3d/e2b616?text=${encodeURIComponent(movie.title)}&font=raleway`;
+            }}
+            style={{ width: '100%', aspectRatio: '2/3', objectFit: 'cover', borderRadius: '8px' }}
           />
           <div className="card-overlay">
             <span className="card-rating">⭐ {movie.vote_average?.toFixed(1)}</span>

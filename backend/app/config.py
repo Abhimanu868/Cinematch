@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
 
     # TMDB API
-    TMDB_API_KEY: str = os.getenv("TMDB_API_KEY", "")
+    TMDB_API_KEY: str = os.getenv("TMDB_API_KEY", "4d6c2b6693e7661b4b1dc0c4277c673a")
     TMDB_IMAGE_BASE_URL: str = "https://image.tmdb.org/t/p/w500"
     TMDB_BACKDROP_BASE_URL: str = "https://image.tmdb.org/t/p/w1280"
 
