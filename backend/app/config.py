@@ -19,10 +19,10 @@ class Settings(BaseSettings):
     TMDB_BACKDROP_BASE_URL: str = "https://image.tmdb.org/t/p/w1280"
 
     # Database
-    DATABASE_URL: str = "sqlite:///./movie_recommender.db"
+    DATABASE_URL: str = "sqlite:///./cinematch.db"
 
     # JWT Auth
-    SECRET_KEY: str = "super-secret-key-change-in-production"
+    SECRET_KEY: str = "cinematch_jwt_secret_key_2024_do_not_share"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440  # 24 hours
 
@@ -36,7 +36,15 @@ class Settings(BaseSettings):
     # CORS
     CORS_ORIGINS: list[str] = [
         "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost:5175",
+        "http://localhost:5176",
+        "http://localhost:5177",
         "http://localhost:3000",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:5174",
+        "http://127.0.0.1:5175",
+        "http://127.0.0.1:3000",
         "http://frontend:5173",
     ]
 

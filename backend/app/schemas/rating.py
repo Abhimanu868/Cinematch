@@ -1,34 +1,45 @@
-"""Pydantic schemas for Rating endpoints."""
-
-from datetime import datetime
 from pydantic import BaseModel, Field
+from typing import Optional
+from datetime import datetime
 
 
-class RatingBase(BaseModel):
-    """Shared rating fields."""
+class RatingCreate(BaseModel):
     movie_id: int
     score: float = Field(..., ge=1.0, le=5.0)
+    review_text: Optional[str] = Field(None, max_length=2000)
+    review_title: Optional[str] = Field(None, max_length=150)
 
 
-class RatingCreate(RatingBase):
-    """Schema for creating/updating a rating."""
-    pass
+class RatingUpdate(BaseModel):
+    score: Optional[float] = Field(None, ge=1.0, le=5.0)
+    review_text: Optional[str] = Field(None, max_length=2000)
+    review_title: Optional[str] = Field(None, max_length=150)
 
 
-class RatingResponse(RatingBase):
-    """Schema for rating API responses."""
+class ReviewResponse(BaseModel):
     id: int
+    movie_id: int
     user_id: int
-    movie_title: str | None = None
-    movie_poster_url: str | None = None
+    username: str
+    score: float
+    review_text: Optional[str] = None
+    review_title: Optional[str] = None
     created_at: datetime
-    updated_at: datetime
+    edited_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
 
 
-class RatingListResponse(BaseModel):
-    """List of user ratings."""
-    ratings: list[RatingResponse]
-    total: int
+class RatingResponse(BaseModel):
+    id: int
+    movie_id: int
+    user_id: int
+    score: float
+    review_text: Optional[str] = None
+    review_title: Optional[str] = None
+    created_at: datetime
+    edited_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True

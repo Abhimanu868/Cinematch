@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE = import.meta.env.VITE_API_URL || '';
 
 const client = axios.create({
   baseURL: API_BASE,
@@ -40,10 +40,20 @@ export const getTrending = (limit = 20) => client.get('/api/movies/trending', { 
 export const getMovie = (id) => client.get(`/api/movies/${id}`);
 export const getGenres = () => client.get('/api/movies/genres');
 
-// Ratings
-export const submitRating = (data) => client.post('/api/ratings', data);
+// Ratings & Reviews
+export const getMovieReviews = (movieId) => 
+  client.get(`/api/ratings/movie/${movieId}`);
+
+export const submitRating = (data) => 
+  client.post('/api/ratings', data);
+
+export const updateRating = (ratingId, data) => 
+  client.patch(`/api/ratings/${ratingId}`, data);
+
+export const deleteRating = (ratingId) => 
+  client.delete(`/api/ratings/${ratingId}`);
+
 export const getMyRatings = () => client.get('/api/ratings/my-ratings');
-export const deleteRating = (id) => client.delete(`/api/ratings/${id}`);
 
 // Recommendations
 export const getPersonalRecs = (top_n = 20) => client.get('/api/recommendations/personal', { params: { top_n } });

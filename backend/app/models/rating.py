@@ -1,7 +1,7 @@
 """Rating ORM model."""
 
 from datetime import datetime
-from sqlalchemy import Column, Integer, Float, DateTime, ForeignKey, UniqueConstraint
+from sqlalchemy import Column, Integer, Float, DateTime, ForeignKey, UniqueConstraint, Text, String
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -16,8 +16,11 @@ class Rating(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
     movie_id = Column(Integer, ForeignKey("movies.id"), nullable=False, index=True)
     score = Column(Float, nullable=False)  # 1.0 to 5.0
+    review_text = Column(Text, nullable=True)        # the written review
+    review_title = Column(String(150), nullable=True)  # optional short headline
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    edited_at = Column(DateTime, nullable=True)     # set when review is edited
 
     # Relationships
     user = relationship("User", back_populates="ratings")

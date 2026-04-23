@@ -5,6 +5,8 @@ import RatingStars from '../components/RatingStars';
 import RecommendationRow from '../components/RecommendationRow';
 import { formatRuntime, getGenreList } from '../utils/helpers';
 import { useAuthStore } from '../store/authStore';
+import WriteReview from '../components/WriteReview';
+import ReviewsList from '../components/ReviewsList';
 
 export default function MovieDetail() {
   const { id } = useParams();
@@ -13,11 +15,18 @@ export default function MovieDetail() {
   const [loading, setLoading] = useState(true);
   const [simLoading, setSimLoading] = useState(true);
   const { isAuthenticated } = useAuthStore();
+  const [reviewRefresh, setReviewRefresh] = useState(0);
+  const [userRating, setUserRating] = useState(null);
 
   useEffect(() => {
     setLoading(true);
     getMovie(id)
-      .then((r) => setMovie(r.data))
+      .then((r) => {
+        setMovie(r.data);
+        if (r.data.user_rating) {
+            setUserRating({ score: r.data.user_rating });
+        }
+      })
       .catch(() => setMovie(null))
       .finally(() => setLoading(false));
 
@@ -30,6 +39,8 @@ export default function MovieDetail() {
 
   const handleRate = (movieId, score) => {
     setMovie((m) => m ? { ...m, user_rating: score } : m);
+    setUserRating((prev) => ({ ...prev, score }));
+    setReviewRefresh(r => r + 1);
   };
 
   if (loading) return <div className="loading-page"><div className="spinner" /></div>;
@@ -96,6 +107,31 @@ export default function MovieDetail() {
           loading={simLoading}
           emptyMessage="No similar movies found yet."
         />
+
+        {/* ── Reviews Section ── */}
+        <div className="reviews-section" style={{ marginTop: '48px' }}>
+          <h2 className="section-title" style={{ marginBottom: '24px' }}>
+            ⭐ Ratings & Reviews
+          </h2>
+          
+          {/* Write Review Form */}
+          <WriteReview
+            movieId={movie.id}
+            existingRating={userRating}
+            onSubmit={(newRating) => {
+              setUserRating(newRating);
+              setReviewRefresh(r => r + 1);
+            }}
+          />
+
+          <div style={{ height: '1px', background: '#2a2a3e', margin: '32px 0' }} />
+
+          {/* Reviews List */}
+          <ReviewsList 
+            movieId={movie.id} 
+            refreshTrigger={reviewRefresh}
+          />
+        </div>
       </div>
     </div>
   );
