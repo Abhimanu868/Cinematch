@@ -12,7 +12,7 @@ export default function Profile() {
   useEffect(() => {
     if (!isAuthenticated) return;
     getMyRatings()
-      .then((r) => setRatings(r.data.ratings))
+      .then((r) => setRatings(Array.isArray(r.data) ? r.data : []))
       .catch(() => setRatings([]))
       .finally(() => setLoading(false));
   }, [isAuthenticated]);
@@ -63,20 +63,77 @@ export default function Profile() {
               <div key={r.id} className="rating-item">
                 <Link to={`/movies/${r.movie_id}`} className="rating-poster">
                   <img
-                    src={r.movie_poster_url || `https://picsum.photos/seed/${r.movie_id}/60/90`}
+                    src={r.movie_poster_url || `https://placehold.co/60x90/1f1f3d/e2b616?text=${encodeURIComponent(r.movie_title?.charAt(0) || '?')}&font=raleway`}
                     alt={r.movie_title}
-                    onError={(e) => { e.target.src = `https://picsum.photos/seed/m${r.movie_id}/60/90`; }}
+                    onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/60x90/1f1f3d/e2b616?text=?&font=raleway'; }}
                   />
                 </Link>
                 <div className="rating-details">
-                  <Link to={`/movies/${r.movie_id}`} className="rating-movie-title">{r.movie_title}</Link>
+                  <Link to={`/movies/${r.movie_id}`} className="rating-movie-title">
+                    {r.movie_title}
+                  </Link>
+
                   <div className="rating-stars-display">
                     {[1,2,3,4,5].map((s) => (
                       <span key={s} className={`star ${r.score >= s ? 'filled' : ''}`}>★</span>
                     ))}
                     <span className="rating-score-text">{r.score}/5</span>
                   </div>
-                  <span className="rating-date">{new Date(r.updated_at).toLocaleDateString()}</span>
+
+                  {r.movie_genres && (
+                    <span style={{ fontSize: '0.75rem', color: '#888' }}>
+                      {r.movie_genres}
+                    </span>
+                  )}
+
+                  {r.review_title && (
+                    <p style={{
+                      margin: '6px 0 2px',
+                      color: '#e2b616',
+                      fontStyle: 'italic',
+                      fontSize: '0.9rem',
+                    }}>
+                      "{r.review_title}"
+                    </p>
+                  )}
+
+                  {r.review_text ? (
+                    <p style={{
+                      margin: '4px 0 6px',
+                      color: '#ccc',
+                      fontSize: '0.85rem',
+                      lineHeight: '1.5',
+                      whiteSpace: 'pre-wrap',
+                      maxHeight: '80px',
+                      overflow: 'hidden',
+                      maskImage: 'linear-gradient(to bottom, black 60%, transparent 100%)',
+                      WebkitMaskImage: 'linear-gradient(to bottom, black 60%, transparent 100%)',
+                    }}>
+                      {r.review_text}
+                    </p>
+                  ) : (
+                    <p style={{
+                      margin: '4px 0 6px',
+                      color: '#555',
+                      fontSize: '0.8rem',
+                      fontStyle: 'italic',
+                    }}>
+                      No review written —{' '}
+                      <Link
+                        to={`/movies/${r.movie_id}`}
+                        style={{ color: '#e2b616', textDecoration: 'none' }}
+                      >
+                        add one
+                      </Link>
+                    </p>
+                  )}
+
+                  <span className="rating-date">
+                    {r.created_at ? new Date(r.created_at).toLocaleDateString() : ''}
+                    {r.edited_at && (
+                      <em style={{ marginLeft: '6px', color: '#666' }}>(edited)</em>
+                    )}
+                  </span>
                 </div>
                 <button className="rating-delete" onClick={() => handleDelete(r.id)} title="Remove rating">✕</button>
               </div>

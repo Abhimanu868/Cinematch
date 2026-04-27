@@ -43,3 +43,20 @@ class RatingResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class MyRatingResponse(BaseModel):
+    """Rating with movie info — used on the Profile page."""
+    id: int
+    movie_id: int
+    movie_title: str
+    movie_poster_url: Optional[str] = None
+    movie_genres: Optional[str] = None
+    score: float
+    review_text: Optional[str] = None
+    review_title: Optional[str] = None
+    created_at: datetime
+    edited_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True

@@ -6,10 +6,44 @@ from app.database import get_db
 from app.models.movie import Movie
 from app.models.rating import Rating
 from app.models.user import User
-from app.schemas.rating import RatingCreate, RatingUpdate, RatingResponse, ReviewResponse
+from app.schemas.rating import (
+    RatingCreate, RatingUpdate, RatingResponse,
+    ReviewResponse, MyRatingResponse,
+)
 from app.services.auth_service import get_current_user
 
 router = APIRouter(prefix="/api/ratings", tags=["Ratings"])
+
+
+@router.get("/my-ratings", response_model=list[MyRatingResponse])
+def get_my_ratings(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get all ratings and reviews by the current user, with movie info."""
+    results = (
+        db.query(Rating, Movie)
+        .join(Movie, Rating.movie_id == Movie.id)
+        .filter(Rating.user_id == current_user.id)
+        .order_by(Rating.created_at.desc())
+        .all()
+    )
+
+    response = []
+    for rating, movie in results:
+        response.append(MyRatingResponse(
+            id=rating.id,
+            movie_id=rating.movie_id,
+            movie_title=movie.title,
+            movie_poster_url=movie.poster_url,
+            movie_genres=movie.genres,
+            score=rating.score,
+            review_text=getattr(rating, 'review_text', None),
+            review_title=getattr(rating, 'review_title', None),
+            created_at=rating.created_at,
+            edited_at=getattr(rating, 'edited_at', None),
+        ))
+    return response
 
 
 @router.post("", response_model=RatingResponse, status_code=status.HTTP_201_CREATED)
